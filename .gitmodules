@@ -1,3 +1,6 @@
 [submodule "modules/limboai"]
 	path = modules/limboai
 	url = https://github.com/limbonaut/limboai
+[submodule "modules/rapier_2d"]
+	path = modules/rapier_2d
+	url = https://github.com/appsinacup/godot-rapier-physics-module-2d.git
