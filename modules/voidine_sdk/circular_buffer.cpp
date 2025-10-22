@@ -1,4 +1,4 @@
-#include "ring_buffer.h"
+#include "circular_buffer.h"
 
 bool CircularBuffer::is_empty() const {
 	return _size == 0;
