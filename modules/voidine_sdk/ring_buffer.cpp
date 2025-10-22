@@ -56,16 +56,26 @@ void CircularBuffer::advance(int p_steps) {
 	_head = (_head + (p_steps % s) + s) % s;
 }
 
+void CircularBuffer::seek(const int p_pos) {
+	ERR_FAIL_COND(p_pos < 0 || p_pos > (int)data_array.size());
+	_head = p_pos;
+}
+
+void CircularBuffer::set_size(const int p_size) {
+	ERR_FAIL_COND(p_size < 0 || p_size > (int)data_array.size());
+	_size = p_size;
+}
+
 void CircularBuffer::append(const Variant &p_value) {
-	const int s = data_array.size();
-	if (s == 0) {
+	const int c = data_array.size();
+	if (c == 0) {
 		return;
 	}
 
 	data_array[_head] = p_value;
 
-	_head = (_head + 1) % s;
-	if (_size < s) {
+	_head = (_head + 1) % c;
+	if (_size < c) {
 		_size++;
 	}
 }
@@ -181,6 +191,8 @@ void CircularBuffer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("head"), &CircularBuffer::head);
 
 	ClassDB::bind_method(D_METHOD("advance", "steps"), &CircularBuffer::advance, DEFVAL(1));
+	ClassDB::bind_method(D_METHOD("seek", "position"), &CircularBuffer::seek);
+	ClassDB::bind_method(D_METHOD("set_size", "size"), &CircularBuffer::set_size);
 
 	ClassDB::bind_method(D_METHOD("clear"), &CircularBuffer::clear);
 	ClassDB::bind_method(D_METHOD("resize", "capacity"), &CircularBuffer::resize);

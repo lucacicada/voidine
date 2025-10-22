@@ -26,6 +26,8 @@ public:
 	void fill(const Variant &p_value);
 
 	void advance(const int p_steps = 1);
+	void seek(const int p_pos);
+	void set_size(const int p_size);
 
 	void append(const Variant &p_value);
 	void append_array(const Array &p_array);
