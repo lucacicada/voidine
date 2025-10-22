@@ -4729,10 +4729,6 @@ bool Main::iteration() {
 
 		uint64_t physics_begin = OS::get_singleton()->get_ticks_usec();
 
-		if (iters == 0) {
-			OS::get_singleton()->get_main_loop()->iteration_loop_prepare();
-		}
-
 		// Prepare the fixed timestep interpolated nodes BEFORE they are updated
 		// by the physics server, otherwise the current and previous transforms
 		// may be the same, and no interpolation takes place.
@@ -4790,10 +4786,6 @@ bool Main::iteration() {
 		message_queue->flush();
 
 		OS::get_singleton()->get_main_loop()->iteration_end();
-
-		if (iters == advance.physics_steps - 1) {
-			OS::get_singleton()->get_main_loop()->iteration_loop_end();
-		}
 
 		physics_process_ticks = MAX(physics_process_ticks, OS::get_singleton()->get_ticks_usec() - physics_begin); // keep the largest one for reference
 		physics_process_max = MAX(OS::get_singleton()->get_ticks_usec() - physics_begin, physics_process_max);
