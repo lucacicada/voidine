@@ -61,6 +61,7 @@ public:
 	};
 
 	virtual void initialize();
+	virtual int get_override_physics_steps() { return -1; }
 	virtual void iteration_prepare() {}
 	virtual bool physics_process(double p_time);
 	virtual void iteration_end() {}

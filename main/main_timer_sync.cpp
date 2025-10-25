@@ -385,6 +385,10 @@ MainFrameTime MainTimerSync::advance_core(double p_physics_step, int p_physics_t
 		}
 	}
 
+	if (fixed_physics_steps != -1) {
+		ret.physics_steps = fixed_physics_steps;
+	}
+
 	if (ret.physics_steps < 0) {
 		ret.physics_steps = 0;
 	}
@@ -515,6 +519,10 @@ void MainTimerSync::set_cpu_ticks_usec(uint64_t p_cpu_ticks_usec) {
 
 void MainTimerSync::set_fixed_fps(int p_fixed_fps) {
 	fixed_fps = p_fixed_fps;
+}
+
+void MainTimerSync::set_fixed_physics_steps(int p_fixed_physics_steps) {
+	fixed_physics_steps = p_fixed_physics_steps;
 }
 
 // advance one physics frame, return timesteps to take

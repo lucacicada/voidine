@@ -4682,6 +4682,9 @@ bool Main::iteration() {
 	main_timer_sync.set_cpu_ticks_usec(ticks);
 	main_timer_sync.set_fixed_fps(fixed_fps);
 
+	const int fixed_physics_steps = OS::get_singleton()->get_main_loop()->get_override_physics_steps();
+	main_timer_sync.set_fixed_physics_steps(fixed_physics_steps);
+
 	const uint64_t ticks_elapsed = ticks - last_ticks;
 
 	const int physics_ticks_per_second = Engine::get_singleton()->get_physics_ticks_per_second();

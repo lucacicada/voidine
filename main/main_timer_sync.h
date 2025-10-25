@@ -127,6 +127,7 @@ class MainTimerSync {
 	int typical_physics_steps[CONTROL_STEPS];
 
 	int fixed_fps = 0;
+	int fixed_physics_steps = -1;
 
 protected:
 	// returns the fraction of p_physics_step required for the timer to overshoot
@@ -156,6 +157,8 @@ public:
 	void set_cpu_ticks_usec(uint64_t p_cpu_ticks_usec);
 	//set fixed fps
 	void set_fixed_fps(int p_fixed_fps);
+	// set fixed physics steps (-1 to disable)
+	void set_fixed_physics_steps(int p_fixed_physics_steps);
 
 	// advance one frame, return timesteps to take
 	MainFrameTime advance(double p_physics_step, int p_physics_ticks_per_second);
