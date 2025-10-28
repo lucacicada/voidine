@@ -1,3 +1,6 @@
 [submodule "modules/limboai"]
 	path = modules/limboai
 	url = https://github.com/limbonaut/limboai
+[submodule "modules/voidine_sdk"]
+	path = modules/voidine_sdk
+	url = https://github.com/lucacicada/voidine_sdk
