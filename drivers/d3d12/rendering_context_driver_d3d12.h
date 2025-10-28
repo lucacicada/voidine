@@ -34,7 +34,7 @@
 #include "core/string/ustring.h"
 #include "core/templates/rid_owner.h"
 #include "rendering_device_driver_d3d12.h"
-#include "servers/display_server.h"
+#include "servers/display/display_server.h"
 #include "servers/rendering/rendering_context_driver.h"
 
 GODOT_GCC_WARNING_PUSH
@@ -68,7 +68,7 @@ GODOT_CLANG_WARNING_POP
 
 using Microsoft::WRL::ComPtr;
 
-#define ARRAY_SIZE(a) std::size(a)
+#define ARRAY_SIZE(a) std_size(a)
 
 class RenderingContextDriverD3D12 : public RenderingContextDriver {
 	ComPtr<ID3D12DeviceFactory> device_factory;

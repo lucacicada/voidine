@@ -1358,7 +1358,7 @@ String ShaderCompiler::_dump_node_code(const SL::Node *p_node, int p_level, Gene
 					code += ")";
 					if (is_screen_texture && !texture_func_returns_data && actions.apply_luminance_multiplier) {
 						if (RS::get_singleton()->is_low_end()) {
-							code = "(" + code + " / vec4(vec3(scene_data.luminance_multiplier), 1.0))";
+							code = "(" + code + " / vec4(vec3(scene_data_block.data.luminance_multiplier), 1.0))";
 						} else {
 							code = "(" + code + " * vec4(vec3(sc_luminance_multiplier()), 1.0))";
 						}
@@ -1528,6 +1528,17 @@ Error ShaderCompiler::compile(RS::ShaderMode p_mode, const String &p_code, Ident
 
 		// Print the files.
 		for (const KeyValue<String, Vector<String>> &E : includes) {
+			int err_line = -1;
+			for (const ShaderLanguage::FilePosition &include_position : include_positions) {
+				if (include_position.file == E.key) {
+					err_line = include_position.line;
+				}
+			}
+			if (err_line < 0) {
+				// Skip files that don't contain errors.
+				continue;
+			}
+
 			if (E.key.is_empty()) {
 				if (p_path == "") {
 					print_line("--Main Shader--");
@@ -1537,19 +1548,14 @@ Error ShaderCompiler::compile(RS::ShaderMode p_mode, const String &p_code, Ident
 			} else {
 				print_line("--" + E.key + "--");
 			}
-			int err_line = -1;
-			for (int i = 0; i < include_positions.size(); i++) {
-				if (include_positions[i].file == E.key) {
-					err_line = include_positions[i].line;
-				}
-			}
 			const Vector<String> &V = E.value;
 			for (int i = 0; i < V.size(); i++) {
 				if (i == err_line - 1) {
 					// Mark the error line to be visible without having to look at
 					// the trace at the end.
 					print_line(vformat("E%4d-> %s", i + 1, V[i]));
-				} else {
+				} else if ((i == err_line - 3) || (i == err_line - 2) || (i == err_line) || (i == err_line + 1)) {
+					// Print 4 lines around the error line.
 					print_line(vformat("%5d | %s", i + 1, V[i]));
 				}
 			}

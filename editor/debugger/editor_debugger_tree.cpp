@@ -40,7 +40,7 @@
 #include "scene/debugger/scene_debugger.h"
 #include "scene/gui/texture_rect.h"
 #include "scene/resources/packed_scene.h"
-#include "servers/display_server.h"
+#include "servers/display/display_server.h"
 
 EditorDebuggerTree::EditorDebuggerTree() {
 	set_v_size_flags(SIZE_EXPAND_FILL);
@@ -394,6 +394,16 @@ void EditorDebuggerTree::update_scene_tree(const SceneDebuggerTree *p_tree, int 
 	}
 	if (scroll_item) {
 		scroll_to_item(scroll_item, false);
+	}
+
+	if (new_session) {
+		// Some nodes may stay selected between sessions.
+		// Make sure the inspector shows them properly.
+		if (!notify_selection_queued) {
+			callable_mp(this, &EditorDebuggerTree::_notify_selection_changed).call_deferred();
+			notify_selection_queued = true;
+		}
+		new_session = false;
 	}
 
 	last_filter = filter;

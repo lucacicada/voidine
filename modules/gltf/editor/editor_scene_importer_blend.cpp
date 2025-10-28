@@ -247,6 +247,14 @@ Node *EditorSceneFormatImporterBlend::import_scene(const String &p_path, uint32_
 			parameters_map["export_gn_mesh"] = false;
 		}
 	}
+	if (blender_major_version >= 4) {
+		if (p_options.has(SNAME("blender/meshes/gpu_instances")) && p_options[SNAME("blender/meshes/gpu_instances")]) {
+			parameters_map["export_gpu_instances"] = true;
+		} else {
+			parameters_map["export_gpu_instances"] = false;
+		}
+	}
+
 	if (p_options.has(SNAME("blender/meshes/tangents")) && p_options[SNAME("blender/meshes/tangents")]) {
 		parameters_map["export_tangents"] = true;
 	} else {
@@ -368,6 +376,7 @@ void EditorSceneFormatImporterBlend::get_import_options(const String &p_path, Li
 	ADD_OPTION_BOOL("blender/meshes/uvs", true);
 	ADD_OPTION_BOOL("blender/meshes/normals", true);
 	ADD_OPTION_BOOL("blender/meshes/export_geometry_nodes_instances", false);
+	ADD_OPTION_BOOL("blender/meshes/gpu_instances", false);
 	ADD_OPTION_BOOL("blender/meshes/tangents", true);
 	ADD_OPTION_ENUM("blender/meshes/skins", "None,4 Influences (Compatible),All Influences", BLEND_BONE_INFLUENCES_ALL);
 	ADD_OPTION_BOOL("blender/meshes/export_bones_deforming_mesh_only", false);
@@ -516,6 +525,8 @@ void EditorFileSystemImportFormatSupportQueryBlend::_update_icons() {
 }
 
 bool EditorFileSystemImportFormatSupportQueryBlend::query() {
+	ERR_FAIL_COND_V_MSG(DisplayServer::get_singleton()->get_name() == "headless", true, "Blender path is invalid or not set, check your Editor Settings. Cannot configure blender path in headless mode.");
+
 	if (!configure_blender_dialog) {
 		configure_blender_dialog = memnew(ConfirmationDialog);
 		configure_blender_dialog->set_title(TTR("Configure Blender Importer"));
