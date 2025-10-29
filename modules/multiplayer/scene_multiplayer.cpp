@@ -93,10 +93,17 @@ Error SceneMultiplayer::poll() {
 
 		if (pending_peers.has(sender)) {
 			ERR_CONTINUE(len < 2 || (packet[0] & CMD_MASK) != NETWORK_COMMAND_SYS || packet[1] != SYS_COMMAND_AUTH);
-			// Auth message.
-			PackedByteArray pba;
-			pba.resize(len - 2);
-			if (pba.size()) {
+			if (len <= 2) {
+				// Remote complete notification.
+				pending_peers[sender].remote = true;
+				if (pending_peers[sender].local) {
+					pending_peers.erase(sender);
+					_admit_peer(sender);
+				}
+			} else if (!_process_auth_packet(sender, &packet[2], len - 2)) { // offset the packet by 2
+				// Auth message.
+				PackedByteArray pba;
+				pba.resize(len - 2);
 				memcpy(pba.ptrw(), &packet[2], len - 2);
 				// User callback
 				const Variant sv = sender;
@@ -106,13 +113,6 @@ Error SceneMultiplayer::poll() {
 				Callable::CallError ce;
 				auth_callback.callp(argv, 2, ret, ce);
 				ERR_CONTINUE_MSG(ce.error != Callable::CallError::CALL_OK, "Failed to call authentication callback");
-			} else {
-				// Remote complete notification.
-				pending_peers[sender].remote = true;
-				if (pending_peers[sender].local) {
-					pending_peers.erase(sender);
-					_admit_peer(sender);
-				}
 			}
 			continue; // Auth in progress.
 		}
@@ -208,6 +208,10 @@ void SceneMultiplayer::set_multiplayer_peer(const Ref<MultiplayerPeer> &p_peer) 
 
 Ref<MultiplayerPeer> SceneMultiplayer::get_multiplayer_peer() {
 	return multiplayer_peer;
+}
+
+bool SceneMultiplayer::_process_auth_packet(int sender, const uint8_t *packet, int len) {
+	return false;
 }
 
 void SceneMultiplayer::_process_custom(int p_from, uint8_t p_command, const uint8_t *p_packet, int p_packet_len) {
