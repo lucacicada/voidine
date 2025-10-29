@@ -140,7 +140,7 @@ private:
 protected:
 	static void _bind_methods();
 
-	virtual bool _process_auth_packet(int sender, const uint8_t *packet, int len);
+	virtual bool _process_auth_packet(int p_from, const uint8_t *p_packet, int p_packet_len);
 	virtual void _process_custom(int p_from, uint8_t p_command, const uint8_t *p_packet, int p_packet_len);
 	void _process_packet(int p_from, const uint8_t *p_packet, int p_packet_len);
 	void _process_raw(int p_from, const uint8_t *p_packet, int p_packet_len);

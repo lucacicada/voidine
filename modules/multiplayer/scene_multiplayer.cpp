@@ -210,7 +210,7 @@ Ref<MultiplayerPeer> SceneMultiplayer::get_multiplayer_peer() {
 	return multiplayer_peer;
 }
 
-bool SceneMultiplayer::_process_auth_packet(int sender, const uint8_t *packet, int len) {
+bool SceneMultiplayer::_process_auth_packet(int p_from, const uint8_t *p_packet, int p_packet_len) {
 	return false;
 }
 
