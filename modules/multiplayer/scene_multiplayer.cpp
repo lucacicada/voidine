@@ -93,17 +93,10 @@ Error SceneMultiplayer::poll() {
 
 		if (pending_peers.has(sender)) {
 			ERR_CONTINUE(len < 2 || (packet[0] & CMD_MASK) != NETWORK_COMMAND_SYS || packet[1] != SYS_COMMAND_AUTH);
-			if (len <= 2) {
-				// Remote complete notification.
-				pending_peers[sender].remote = true;
-				if (pending_peers[sender].local) {
-					pending_peers.erase(sender);
-					_admit_peer(sender);
-				}
-			} else if (!_process_auth_packet(sender, &packet[2], len - 2)) { // offset the packet by 2
-				// Auth message.
-				PackedByteArray pba;
-				pba.resize(len - 2);
+			// Auth message.
+			PackedByteArray pba;
+			pba.resize(len - 2);
+			if (pba.size()) {
 				memcpy(pba.ptrw(), &packet[2], len - 2);
 				// User callback
 				const Variant sv = sender;
@@ -113,6 +106,13 @@ Error SceneMultiplayer::poll() {
 				Callable::CallError ce;
 				auth_callback.callp(argv, 2, ret, ce);
 				ERR_CONTINUE_MSG(ce.error != Callable::CallError::CALL_OK, "Failed to call authentication callback");
+			} else {
+				// Remote complete notification.
+				pending_peers[sender].remote = true;
+				if (pending_peers[sender].local) {
+					pending_peers.erase(sender);
+					_admit_peer(sender);
+				}
 			}
 			continue; // Auth in progress.
 		}
@@ -210,14 +210,6 @@ Ref<MultiplayerPeer> SceneMultiplayer::get_multiplayer_peer() {
 	return multiplayer_peer;
 }
 
-bool SceneMultiplayer::_process_auth_packet(int p_from, const uint8_t *p_packet, int p_packet_len) {
-	return false;
-}
-
-void SceneMultiplayer::_process_custom(int p_from, uint8_t p_command, const uint8_t *p_packet, int p_packet_len) {
-	ERR_FAIL_MSG("Invalid network command from " + itos(p_from));
-}
-
 void SceneMultiplayer::_process_packet(int p_from, const uint8_t *p_packet, int p_packet_len) {
 	ERR_FAIL_COND_MSG(root_path.is_empty(), "Multiplayer root was not initialized. If you are using custom multiplayer, remember to set the root path via SceneMultiplayer.set_root_path before using it.");
 	ERR_FAIL_COND_MSG(p_packet_len < 1, "Invalid packet received. Size too small.");
@@ -251,7 +243,7 @@ void SceneMultiplayer::_process_packet(int p_from, const uint8_t *p_packet, int 
 			replicator->on_sync_receive(p_from, p_packet, p_packet_len);
 		} break;
 		default: {
-			_process_custom(p_from, packet_type, p_packet, p_packet_len);
+			ERR_FAIL_MSG("Invalid network command from " + itos(p_from));
 		} break;
 	}
 }
@@ -262,24 +254,6 @@ _FORCE_INLINE_ Error SceneMultiplayer::_send(const uint8_t *p_packet, int p_pack
 	return multiplayer_peer->put_packet(p_packet, p_packet_len);
 }
 #endif
-
-Error SceneMultiplayer::send_custom(uint8_t p_command, Vector<uint8_t> p_data, int p_to, MultiplayerPeer::TransferMode p_mode, int p_channel) {
-	ERR_FAIL_COND_V_MSG(p_data.is_empty(), ERR_INVALID_DATA, "Trying to send an empty custom packet.");
-	ERR_FAIL_COND_V_MSG(multiplayer_peer.is_null(), ERR_UNCONFIGURED, "Trying to send a custom packet while no multiplayer peer is active.");
-	ERR_FAIL_COND_V_MSG(multiplayer_peer->get_connection_status() != MultiplayerPeer::CONNECTION_CONNECTED, ERR_UNCONFIGURED, "Trying to send a custom packet via a multiplayer peer which is not connected.");
-
-	if (packet_cache.size() < p_data.size() + 1) {
-		packet_cache.resize(p_data.size() + 1);
-	}
-
-	const uint8_t *r = p_data.ptr();
-	packet_cache.write[0] = p_command;
-	memcpy(&packet_cache.write[1], &r[0], p_data.size());
-
-	multiplayer_peer->set_transfer_channel(p_channel);
-	multiplayer_peer->set_transfer_mode(p_mode);
-	return send_command(p_to, packet_cache.ptr(), p_data.size() + 1);
-}
 
 Error SceneMultiplayer::send_command(int p_to, const uint8_t *p_packet, int p_packet_len) {
 	if (server_relay && get_unique_id() != 1 && p_to != 1 && multiplayer_peer->is_server_relay_supported()) {

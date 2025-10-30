@@ -97,8 +97,7 @@ public:
 
 	// This is the mask that will be used to extract the command.
 	enum {
-		// CMD_MASK = 7, // 0x7 -> 0b00000111
-		CMD_MASK = 15, // 0xF -> 0b00001111
+		CMD_MASK = 7, // 0x7 -> 0b00000111
 	};
 
 private:
@@ -140,9 +139,7 @@ private:
 protected:
 	static void _bind_methods();
 
-	virtual bool _process_auth_packet(int p_from, const uint8_t *p_packet, int p_packet_len);
-	virtual void _process_custom(int p_from, uint8_t p_command, const uint8_t *p_packet, int p_packet_len);
-	void _process_packet(int p_from, const uint8_t *p_packet, int p_packet_len);
+	virtual void _process_packet(int p_from, const uint8_t *p_packet, int p_packet_len);
 	void _process_raw(int p_from, const uint8_t *p_packet, int p_packet_len);
 	void _process_sys(int p_from, const uint8_t *p_packet, int p_packet_len, MultiplayerPeer::TransferMode p_mode, int p_channel);
 
@@ -181,7 +178,6 @@ public:
 	double get_auth_timeout() const;
 	Vector<int> get_authenticating_peer_ids();
 
-	Error send_custom(uint8_t p_command, Vector<uint8_t> p_data, int p_to, MultiplayerPeer::TransferMode p_mode, int p_channel);
 	Error send_command(int p_to, const uint8_t *p_packet, int p_packet_len); // Used internally to relay packets when needed.
 	Error send_bytes(Vector<uint8_t> p_data, int p_to = MultiplayerPeer::TARGET_PEER_BROADCAST, MultiplayerPeer::TransferMode p_mode = MultiplayerPeer::TRANSFER_MODE_RELIABLE, int p_channel = 0);
 	String get_rpc_md5(const Object *p_obj);
