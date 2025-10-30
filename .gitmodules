@@ -4,3 +4,6 @@
 [submodule "modules/voidine_sdk"]
 	path = modules/voidine_sdk
 	url = https://github.com/lucacicada/voidine_sdk
+[submodule "modules/rapier_2d"]
+	path = modules/rapier_2d
+	url = https://github.com/appsinacup/godot-rapier-physics-module-2d
