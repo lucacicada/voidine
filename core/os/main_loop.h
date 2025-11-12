@@ -33,6 +33,8 @@
 #include "core/object/gdvirtual.gen.inc"
 #include "core/object/object.h"
 
+struct MainFrameTime;
+
 class MainLoop : public Object {
 	GDCLASS(MainLoop, Object);
 
@@ -59,6 +61,7 @@ public:
 		NOTIFICATION_TEXT_SERVER_CHANGED = 2018,
 	};
 
+	virtual void advance(MainFrameTime &p_time) {}
 	virtual void initialize();
 	virtual int get_override_physics_steps() { return -1; }
 	virtual void iteration_prepare() {}

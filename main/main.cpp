@@ -4659,6 +4659,7 @@ bool Main::iteration() {
 	const double time_scale = Engine::get_singleton()->get_effective_time_scale();
 
 	MainFrameTime advance = main_timer_sync.advance(physics_step, physics_ticks_per_second);
+	OS::get_singleton()->get_main_loop()->advance(advance);
 	double process_step = advance.process_step;
 	double scaled_step = process_step * time_scale;
 
